@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.web.*?>
+<?import javafx.scene.effect.*?>
+<?import java.lang.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.layout.BorderPane?>
+
+<BorderPane prefHeight="600" prefWidth="800" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.forgeessentials.remote.client.gui.MainController">
+	<center>
+		<TabPane tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER" />
+	</center>
+	<top>
+		<ToolBar prefHeight="40.0" BorderPane.alignment="CENTER">
+			<items>
+				<Button fx:id="serverManager" onAction="#openServerManager" text="Server Manager" />
+			</items>
+		</ToolBar>
+	</top>
+	<bottom>
+		<Label maxWidth="1.7976931348623157E308" text="Status bar" BorderPane.alignment="CENTER">
+			<padding>
+				<Insets left="4.0" right="4.0" />
+			</padding>
+		</Label>
+	</bottom>
+</BorderPane>
