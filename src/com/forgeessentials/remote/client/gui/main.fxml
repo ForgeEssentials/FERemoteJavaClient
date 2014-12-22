@@ -15,7 +15,7 @@
 	<top>
 		<ToolBar prefHeight="40.0" BorderPane.alignment="CENTER">
 			<items>
-				<Button fx:id="serverManager" onAction="#openServerManager" text="Server Manager" />
+				<Button onAction="#openServerManager" text="Server Manager" />
 			</items>
 		</ToolBar>
 	</top>
