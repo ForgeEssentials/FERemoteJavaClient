@@ -27,6 +27,7 @@
 				<TreeTableColumn fx:id="serverTableAddress" maxWidth="1000.0" minWidth="100.0" prefWidth="-1.0" text="Address" />
 				<TreeTableColumn fx:id="serverTablePort" maxWidth="60.0" minWidth="60.0" prefWidth="-1.0" text="Port" />
 				<TreeTableColumn fx:id="serverTableUsername" maxWidth="1000.0" prefWidth="-1.0" text="Username" />
+            <TreeTableColumn fx:id="serverTableSsl" maxWidth="40.0" minWidth="40.0" prefWidth="-1.0" text="SSL" />
 			</columns>
 			<columnResizePolicy>
 				<TreeTableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
@@ -68,6 +69,11 @@
                         <Insets />
                      </HBox.margin>
                   </VBox>
+                  <CheckBox fx:id="ssl" mnemonicParsing="false" text="SSL">
+                     <HBox.margin>
+                        <Insets top="20.0" />
+                     </HBox.margin>
+                  </CheckBox>
                </children>
             </HBox>
             <HBox spacing="12.0">

@@ -7,6 +7,7 @@ import java.util.Iterator;
 import java.util.ResourceBundle;
 import java.util.Set;
 
+import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -15,6 +16,7 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeTableColumn;
@@ -49,6 +51,9 @@ public class ServerManagerController implements Initializable {
     TreeTableColumn<Server, String> serverTableUsername;
 
     @FXML
+    TreeTableColumn<Server, Boolean> serverTableSsl;
+
+    @FXML
     TextField name;
 
     @FXML
@@ -63,30 +68,42 @@ public class ServerManagerController implements Initializable {
     @FXML
     TextField passkey;
 
+    @FXML
+    CheckBox ssl;
+
+    private ObjectProperty<Server> serversRootProperty;
+
     private Server serversRoot;
 
     private Server selectedServer;
 
-    public Server getServersRoot()
-    {
-        return serversRoot;
-    }
+    private boolean result;
 
     public Server getSelectedServer()
     {
         return selectedServer;
     }
 
+    public boolean getResult()
+    {
+        return result;
+    }
+
+    public void init(ObjectProperty<Server> serversRootProperty)
+    {
+        this.serversRootProperty = serversRootProperty;
+        this.serversRoot = new Server(serversRootProperty.get());
+        serverTable.setRoot(new ServerTreeItem(serversRoot));
+    }
+
     @Override
     public void initialize(URL location, ResourceBundle resources)
     {
-        serversRoot = new Server(Main.serversRoot);
-
         serverTableName.setCellValueFactory(new TreeItemPropertyValueFactory<Server, String>("name"));
         serverTableAddress.setCellValueFactory(new TreeItemPropertyValueFactory<Server, String>("address"));
         serverTableUsername.setCellValueFactory(new TreeItemPropertyValueFactory<Server, String>("username"));
         serverTablePort.setCellValueFactory(new TreeItemPropertyValueFactory<Server, String>("port"));
-        serverTable.setRoot(new ServerTreeItem(serversRoot));
+        serverTableSsl.setCellValueFactory(new TreeItemPropertyValueFactory<Server, Boolean>("ssl"));
 
         makeIntegerTextField(port);
 
@@ -106,6 +123,7 @@ public class ServerManagerController implements Initializable {
                         port.textProperty().unbindBidirectional(oldValue.getValue().portProperty());
                         username.textProperty().unbindBidirectional(oldValue.getValue().usernameProperty());
                         passkey.textProperty().unbindBidirectional(oldValue.getValue().passkeyProperty());
+                        ssl.selectedProperty().unbindBidirectional(oldValue.getValue().sslProperty());
                     }
                 }
                 name.clear();
@@ -113,6 +131,7 @@ public class ServerManagerController implements Initializable {
                 port.clear();
                 username.clear();
                 passkey.clear();
+                ssl.setSelected(false);
                 if (newValue != null && newValue.getValue() != null)
                 {
                     name.textProperty().bindBidirectional(newValue.getValue().nameProperty());
@@ -123,6 +142,7 @@ public class ServerManagerController implements Initializable {
                         port.textProperty().bindBidirectional(newValue.getValue().portProperty(), numberStringConverter);
                         username.textProperty().bindBidirectional(newValue.getValue().usernameProperty());
                         passkey.textProperty().bindBidirectional(newValue.getValue().passkeyProperty());
+                        ssl.selectedProperty().bindBidirectional(newValue.getValue().sslProperty());
                     }
                 }
                 else
@@ -212,23 +232,23 @@ public class ServerManagerController implements Initializable {
     @FXML
     public void ok()
     {
-        Main.serversRoot = serversRoot;
+        result = selectedServer != null;
+        serversRootProperty.set(serversRoot);
         ((Stage) root.getScene().getWindow()).close();
     }
 
     @FXML
     public void cancel(ActionEvent event)
     {
-        selectedServer = null;
+        result = false;
         ((Stage) root.getScene().getWindow()).close();
     }
 
     @FXML
     public void apply(ActionEvent event)
     {
-        Main.serversRoot = serversRoot;
+        serversRootProperty.set(serversRoot);
         serversRoot = new Server(serversRoot);
-        Main.save();
     }
 
     public class ServerTreeItem extends TreeItem<Server> {

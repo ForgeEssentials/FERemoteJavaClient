@@ -10,7 +10,7 @@
 
 <BorderPane prefHeight="600" prefWidth="800" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.forgeessentials.remote.client.gui.MainController">
 	<center>
-		<TabPane tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER" />
+		<TabPane fx:id="servers" tabClosingPolicy="ALL_TABS" BorderPane.alignment="CENTER" />
 	</center>
 	<top>
 		<ToolBar prefHeight="40.0" BorderPane.alignment="CENTER">
