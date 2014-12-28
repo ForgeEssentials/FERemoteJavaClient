@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.effect.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.media.*?>
+<?import javafx.scene.paint.*?>
+<?import javafx.scene.shape.*?>
+<?import javafx.scene.web.*?>
+
+<Tab text="Permissions" fx:id="tab" fx:controller="com.forgeessentials.remote.client.gui.features.PermissionsController" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/2.2">
+  <content>
+    <AnchorPane id="Content" minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+      <children>
+        <CubicCurve controlX1="50.0" controlX2="65.0" controlY1="-12.0" controlY2="53.0" endX="15.0" endY="90.0" layoutX="103.0" layoutY="73.0" startX="15.0" startY="27.0" stroke="BLACK">
+          <fill>
+            <Color blue="0.000" green="0.250" red="1.000" fx:id="x1" />
+          </fill>
+        </CubicCurve>
+        <CubicCurve controlX1="48.0" controlX2="26.0" controlY1="-16.0" controlY2="39.0" endX="79.0" endY="85.0" fill="$x1" layoutX="40.0" layoutY="78.0" startX="79.0" startY="21.0" stroke="BLACK" />
+      </children>
+    </AnchorPane>
+  </content>
+</Tab>

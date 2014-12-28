@@ -67,7 +67,7 @@ public class MainController implements Initializable {
 
     public void disconnect(ServerController controller)
     {
-        controller.close();
+        controller.stop();
     }
 
     public void loadServers()
@@ -186,7 +186,7 @@ public class MainController implements Initializable {
 
         public void close()
         {
-            controller.close();
+            controller.stop();
         }
 
     }

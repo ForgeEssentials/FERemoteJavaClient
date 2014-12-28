@@ -113,7 +113,7 @@ public class Server {
 
     public boolean isFolder()
     {
-        return address == null || address.isEmpty().get();
+        return address == null || address.get() == null;
     }
 
 }

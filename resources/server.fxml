@@ -1,20 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.shape.*?>
-<?import javafx.scene.media.*?>
-<?import javafx.geometry.*?>
-<?import javafx.scene.web.*?>
-<?import javafx.scene.effect.*?>
 <?import java.lang.*?>
+<?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
+<?import javafx.scene.effect.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.media.*?>
+<?import javafx.scene.paint.*?>
+<?import javafx.scene.shape.*?>
+<?import javafx.scene.web.*?>
 
-<BorderPane fx:id="root" prefHeight="600.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.forgeessentials.remote.client.gui.ServerController">
-   <bottom>
-      <ListView fx:id="log" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER" />
-   </bottom>
-   <center>
-      <TabPane fx:id="features" prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER" />
-   </center>
+<BorderPane fx:id="root" prefHeight="675.0" prefWidth="600.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/2.2" fx:controller="com.forgeessentials.remote.client.gui.ServerController">
+  <bottom>
+    <VBox fillWidth="true" prefHeight="200.0" prefWidth="100.0">
+      <children>
+        <Separator prefHeight="8.0" prefWidth="200.0" />
+        <ListView fx:id="log" prefHeight="149.0" prefWidth="600.0" style=".list-cell:filled {&#10;    -fx-text-fill: red;&#10;}" VBox.vgrow="ALWAYS" />
+      </children>
+    </VBox>
+  </bottom>
+  <center>
+    <TabPane fx:id="features" prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER">
+      <tabs>
+        <fx:include source="features/players.fxml"/>
+        <fx:include source="features/permissions.fxml"/>
+      </tabs>
+    </TabPane>
+  </center>
 </BorderPane>

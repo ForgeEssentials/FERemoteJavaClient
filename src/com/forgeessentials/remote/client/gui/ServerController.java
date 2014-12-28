@@ -1,13 +1,11 @@
 package com.forgeessentials.remote.client.gui;
 
 import java.io.IOException;
-import java.net.URL;
-import java.util.ResourceBundle;
 
 import javafx.application.Platform;
 import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
 import javafx.scene.control.ListView;
+import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.layout.BorderPane;
 
@@ -15,13 +13,14 @@ import com.forgeessentials.remote.client.RemoteClient;
 import com.forgeessentials.remote.client.RemoteRequest;
 import com.forgeessentials.remote.client.RemoteRequest.PushRequestData;
 import com.forgeessentials.remote.client.RemoteResponse;
+import com.forgeessentials.remote.client.RemoteResponse.JsonRemoteResponse;
 import com.forgeessentials.remote.client.RequestAuth;
 import com.forgeessentials.remote.client.data.PushChatHandler;
 import com.forgeessentials.remote.client.gui.MainController.ServerTab;
+import com.forgeessentials.remote.client.gui.features.FeatureController;
 import com.forgeessentials.remote.client.gui.model.Server;
-import com.google.gson.JsonElement;
 
-public class ServerController implements Initializable, Runnable {
+public class ServerController implements Runnable {
 
     public static final int TIMEOUT = 30 * 1000;
 
@@ -50,13 +49,22 @@ public class ServerController implements Initializable, Runnable {
         try
         {
             client = new RemoteClient(server.addressProperty().get(), server.portProperty().get());
-            if (!server.usernameProperty().isEmpty().get())
+            if (!server.usernameProperty().get().isEmpty())
                 auth = new RequestAuth(server.usernameProperty().get(), server.passkeyProperty().get());
             else
                 auth = null;
             new Thread(this).start();
             queryCapabilities();
             pushChat(true);
+
+            // Initialize controllers for feature-tabs
+            for (Tab tab : features.getTabs())
+                if (tab.getUserData() instanceof FeatureController)
+                {
+                    FeatureController controller = (FeatureController) tab.getUserData();
+                    controller.setServerController(this);
+                    controller.init();
+                }
         }
         catch (IOException e)
         {
@@ -66,12 +74,16 @@ public class ServerController implements Initializable, Runnable {
         return true;
     }
 
-    @Override
-    public void initialize(URL location, ResourceBundle resources)
+    public void stop()
     {
+        // Stop controllers for feature-tabs
+        for (Tab tab : features.getTabs())
+            if (tab.getUserData() instanceof FeatureController)
+                ((FeatureController) tab.getUserData()).stop();
+        client.close();
     }
 
-    private void log(final String string)
+    public void log(final String string)
     {
         Platform.runLater(new Runnable() {
             @Override
@@ -85,43 +97,58 @@ public class ServerController implements Initializable, Runnable {
     }
 
     /* ------------------------------------------------------------ */
+    /* Message loop */
 
     @Override
     public void run()
     {
         while (!client.isClosed())
         {
-            RemoteResponse<JsonElement> response = client.getNextResponse(0);
+            JsonRemoteResponse response = client.getNextResponse(0);
             if (response != null)
-            {
-                if (response.id == null)
-                    handleUnknownMessage(response);
-                else
+                handleResponse(response);
+        }
+    }
+
+    protected void handleResponse(JsonRemoteResponse response)
+    {
+        boolean handled = false;
+        for (Tab tab : features.getTabs())
+            if (tab.getUserData() instanceof FeatureController)
+                if (((FeatureController) tab.getUserData()).handleResponse(response))
                 {
-                    switch (response.id)
-                    {
-                    case PushChatHandler.ID:
-                    {
-                        RemoteResponse<PushChatHandler.Response> r = client.transformResponse(response, PushChatHandler.Response.class);
-                        log(String.format("Chat (%s): %s", r.data.username, r.data.message));
-                        break;
-                    }
-                    case "shutdown":
-                    {
-                        log("Server shutdown");
-                        client.close();
-                        break;
-                    }
-                    default:
-                        handleUnknownMessage(response);
-                        break;
-                    }
+                    handled = true;
+                    break;
                 }
+        if (!handled)
+        {
+            if (response.id == null)
+            {
+                handleUnknownResponse(response);
+                return;
+            }
+            switch (response.id)
+            {
+            case PushChatHandler.ID:
+            {
+                RemoteResponse<PushChatHandler.Response> r = client.transformResponse(response, PushChatHandler.Response.class);
+                log(String.format("Chat (%s): %s", r.data.username, r.data.message));
+                break;
+            }
+            case "shutdown":
+            {
+                log("Server shutdown");
+                client.close();
+                break;
+            }
+            default:
+                handleUnknownResponse(response);
+                break;
             }
         }
     }
 
-    public void handleUnknownMessage(RemoteResponse<JsonElement> response)
+    public void handleUnknownResponse(JsonRemoteResponse response)
     {
         if (response.id == null)
             response.id = "";
@@ -145,10 +172,12 @@ public class ServerController implements Initializable, Runnable {
         }
     }
 
+    /* ------------------------------------------------------------ */
+
     private void queryCapabilities()
     {
         RemoteRequest<Object> request = new RemoteRequest<Object>("query_remote_capabilities", auth, null);
-        RemoteResponse<JsonElement> response = client.sendRequestAndWait(request, TIMEOUT);
+        JsonRemoteResponse response = client.sendRequestAndWait(request, TIMEOUT);
         if (response == null)
         {
             log("Error: no response");
@@ -159,13 +188,13 @@ public class ServerController implements Initializable, Runnable {
             log("Error: " + response.message);
             return;
         }
-        log(response.data.toString());
+        log("Capabilities: " + response.data.toString());
     }
 
     private void pushChat(boolean enable)
     {
         RemoteRequest<PushRequestData> request = new RemoteRequest<PushRequestData>("push_chat", auth, new PushRequestData(enable));
-        RemoteResponse<JsonElement> response = client.sendRequestAndWait(request, TIMEOUT);
+        JsonRemoteResponse response = client.sendRequestAndWait(request, TIMEOUT);
         if (response == null)
         {
             log("Error: no response");
@@ -199,11 +228,6 @@ public class ServerController implements Initializable, Runnable {
     public ServerTab getTab()
     {
         return serverTab;
-    }
-
-    public void close()
-    {
-        client.close();
     }
 
 }
