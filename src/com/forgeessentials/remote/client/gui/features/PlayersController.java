@@ -22,43 +22,45 @@ import com.forgeessentials.remote.client.RemoteRequest;
 import com.forgeessentials.remote.client.RemoteResponse;
 import com.forgeessentials.remote.client.RemoteResponse.JsonRemoteResponse;
 import com.forgeessentials.remote.client.data.DataFloatLocation;
-import com.forgeessentials.remote.client.data.QueryPlayerHandler;
-import com.forgeessentials.remote.client.data.QueryPlayerHandler.PlayerInfoResponse;
+import com.forgeessentials.remote.client.network.QueryPlayerHandler;
+import com.forgeessentials.remote.client.network.QueryPlayerHandler.PlayerInfoResponse;
 
 public class PlayersController extends FeatureController {
 
     @FXML
-    TableView<PlayerInfo> playersTable;
+    protected TableView<PlayerInfo> playersTable;
 
     @FXML
-    TableColumn<PlayerInfo, String> colName;
+    protected TableColumn<PlayerInfo, String> colName;
 
     @FXML
-    TableColumn<PlayerInfo, String> colHealth;
+    protected TableColumn<PlayerInfo, String> colHealth;
 
     @FXML
-    TableColumn<PlayerInfo, String> colArmor;
+    protected TableColumn<PlayerInfo, String> colArmor;
 
     @FXML
-    TableColumn<PlayerInfo, String> colHunger;
+    protected TableColumn<PlayerInfo, String> colHunger;
 
     @FXML
-    TableColumn<PlayerInfo, String> colSaturation;
+    protected TableColumn<PlayerInfo, String> colSaturation;
 
     @FXML
-    TableColumn<PlayerInfo, String> colLocation;
+    protected TableColumn<PlayerInfo, String> colLocation;
 
     @FXML
-    CheckBox flagDetails;
+    protected CheckBox flagDetails;
 
     @FXML
-    CheckBox flagLocation;
+    protected CheckBox flagLocation;
 
-    Timer updateTimer;
+    protected Timer updateTimer;
 
     @Override
     public void init()
     {
+        tab.setText("Players");
+        
         colName.setCellValueFactory(new PropertyValueFactory<PlayerInfo, String>("name"));
         colHealth.setCellValueFactory(new PropertyValueFactory<PlayerInfo, String>("health"));
         colArmor.setCellValueFactory(new PropertyValueFactory<PlayerInfo, String>("armor"));
@@ -127,7 +129,8 @@ public class PlayersController extends FeatureController {
                         playerInfo.hunger = new SimpleIntegerProperty(pi.data.get("hunger").getAsInt());
                     if (pi.data.containsKey("saturation"))
                         playerInfo.saturation = new SimpleFloatProperty(pi.data.get("saturation").getAsFloat());
-                    if (pi.data.containsKey("location")) {
+                    if (pi.data.containsKey("location"))
+                    {
                         DataFloatLocation loc = serverController.getClient().getGson().fromJson(pi.data.get("location"), DataFloatLocation.class);
                         playerInfo.location = new SimpleStringProperty(loc.toString());
                     }

@@ -11,21 +11,22 @@
 <?import javafx.scene.shape.*?>
 <?import javafx.scene.web.*?>
 
-<BorderPane fx:id="root" prefHeight="675.0" prefWidth="600.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/2.2" fx:controller="com.forgeessentials.remote.client.gui.ServerController">
-  <bottom>
-    <VBox fillWidth="true" prefHeight="200.0" prefWidth="100.0">
-      <children>
-        <Separator prefHeight="8.0" prefWidth="200.0" />
-        <ListView fx:id="log" prefHeight="149.0" prefWidth="600.0" style=".list-cell:filled {&#10;    -fx-text-fill: red;&#10;}" VBox.vgrow="ALWAYS" />
-      </children>
-    </VBox>
-  </bottom>
-  <center>
-    <TabPane fx:id="features" prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER">
-      <tabs>
-        <fx:include source="features/players.fxml"/>
-        <fx:include source="features/permissions.fxml"/>
-      </tabs>
-    </TabPane>
-  </center>
-</BorderPane>
+<SplitPane fx:id="root" dividerPositions="0.75" orientation="VERTICAL" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.forgeessentials.remote.client.gui.ServerController">
+	<items>
+		<TabPane fx:id="features" prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE">
+			<tabs>
+				<Tab text="Permissions">
+					<content>
+						<fx:include source="features/permissions.fxml" />
+					</content>
+				</Tab>
+				<Tab text="Players">
+					<content>
+						<fx:include source="features/players.fxml" />
+					</content>
+				</Tab>
+			</tabs>
+		</TabPane>
+		<ListView fx:id="log" prefHeight="149.0" prefWidth="600.0" style=".list-cell:filled {&#10;    -fx-text-fill: red;&#10;}" />
+	</items>
+</SplitPane>

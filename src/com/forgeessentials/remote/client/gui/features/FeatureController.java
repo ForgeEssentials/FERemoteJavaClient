@@ -6,6 +6,7 @@ import java.util.ResourceBundle;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Tab;
+import javafx.scene.layout.Region;
 
 import com.forgeessentials.remote.client.RemoteResponse.JsonRemoteResponse;
 import com.forgeessentials.remote.client.gui.ServerController;
@@ -13,20 +14,22 @@ import com.forgeessentials.remote.client.gui.ServerController;
 public abstract class FeatureController implements Initializable {
 
     @FXML
-    Tab tab;
+    protected Region root;
 
-    @FXML
-    ServerController serverController;
+    protected ServerController serverController;
 
-    public void setServerController(ServerController serverController)
+    protected Tab tab;
+
+    public void setParent(ServerController serverController, Tab tab)
     {
         this.serverController = serverController;
+        this.tab = tab;
     }
 
     @Override
     public void initialize(URL location, ResourceBundle resources)
     {
-        tab.setUserData(this);
+        root.setUserData(this);
     }
 
     public abstract void init();

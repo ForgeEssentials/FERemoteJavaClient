@@ -8,7 +8,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.layout.BorderPane?>
 
-<BorderPane prefHeight="600" prefWidth="800" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.forgeessentials.remote.client.gui.MainController">
+<BorderPane prefHeight="800" prefWidth="1000" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.forgeessentials.remote.client.gui.MainController">
 	<center>
 		<TabPane fx:id="servers" tabClosingPolicy="ALL_TABS" BorderPane.alignment="CENTER" />
 	</center>

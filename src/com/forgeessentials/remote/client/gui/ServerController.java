@@ -7,7 +7,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.ListView;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
-import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.Region;
 
 import com.forgeessentials.remote.client.RemoteClient;
 import com.forgeessentials.remote.client.RemoteRequest;
@@ -15,23 +15,23 @@ import com.forgeessentials.remote.client.RemoteRequest.PushRequestData;
 import com.forgeessentials.remote.client.RemoteResponse;
 import com.forgeessentials.remote.client.RemoteResponse.JsonRemoteResponse;
 import com.forgeessentials.remote.client.RequestAuth;
-import com.forgeessentials.remote.client.data.PushChatHandler;
 import com.forgeessentials.remote.client.gui.MainController.ServerTab;
 import com.forgeessentials.remote.client.gui.features.FeatureController;
 import com.forgeessentials.remote.client.gui.model.Server;
+import com.forgeessentials.remote.client.network.PushChatHandler;
 
 public class ServerController implements Runnable {
 
     public static final int TIMEOUT = 30 * 1000;
 
     @FXML
-    BorderPane root;
+    protected Region root;
 
     @FXML
-    ListView<String> log;
+    protected ListView<String> log;
 
     @FXML
-    TabPane features;
+    protected TabPane features;
 
     private RemoteClient client;
 
@@ -59,10 +59,10 @@ public class ServerController implements Runnable {
 
             // Initialize controllers for feature-tabs
             for (Tab tab : features.getTabs())
-                if (tab.getUserData() instanceof FeatureController)
+                if (tab.getContent().getUserData() instanceof FeatureController)
                 {
-                    FeatureController controller = (FeatureController) tab.getUserData();
-                    controller.setServerController(this);
+                    FeatureController controller = (FeatureController) tab.getContent().getUserData();
+                    controller.setParent(this, tab);
                     controller.init();
                 }
         }
@@ -78,8 +78,8 @@ public class ServerController implements Runnable {
     {
         // Stop controllers for feature-tabs
         for (Tab tab : features.getTabs())
-            if (tab.getUserData() instanceof FeatureController)
-                ((FeatureController) tab.getUserData()).stop();
+            if (tab.getContent().getUserData() instanceof FeatureController)
+                ((FeatureController) tab.getContent().getUserData()).stop();
         client.close();
     }
 
@@ -114,8 +114,8 @@ public class ServerController implements Runnable {
     {
         boolean handled = false;
         for (Tab tab : features.getTabs())
-            if (tab.getUserData() instanceof FeatureController)
-                if (((FeatureController) tab.getUserData()).handleResponse(response))
+            if (tab.getContent().getUserData() instanceof FeatureController)
+                if (((FeatureController) tab.getContent().getUserData()).handleResponse(response))
                 {
                     handled = true;
                     break;

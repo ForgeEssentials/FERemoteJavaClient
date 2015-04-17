@@ -33,43 +33,43 @@ import com.forgeessentials.remote.client.gui.model.Server;
 public class ServerManagerController implements Initializable {
 
     @FXML
-    BorderPane root;
+    protected BorderPane root;
 
     @FXML
-    TreeTableView<Server> serverTable;
+    protected TreeTableView<Server> serverTable;
 
     @FXML
-    TreeTableColumn<Server, String> serverTableName;
+    protected TreeTableColumn<Server, String> serverTableName;
 
     @FXML
-    TreeTableColumn<Server, String> serverTableAddress;
+    protected TreeTableColumn<Server, String> serverTableAddress;
 
     @FXML
-    TreeTableColumn<Server, String> serverTablePort;
+    protected TreeTableColumn<Server, String> serverTablePort;
 
     @FXML
-    TreeTableColumn<Server, String> serverTableUsername;
+    protected TreeTableColumn<Server, String> serverTableUsername;
 
     @FXML
-    TreeTableColumn<Server, Boolean> serverTableSsl;
+    protected TreeTableColumn<Server, Boolean> serverTableSsl;
 
     @FXML
-    TextField name;
+    protected TextField name;
 
     @FXML
-    TextField address;
+    protected TextField address;
 
     @FXML
-    TextField port;
+    protected TextField port;
 
     @FXML
-    TextField username;
+    protected TextField username;
 
     @FXML
-    TextField passkey;
+    protected TextField passkey;
 
     @FXML
-    CheckBox ssl;
+    protected CheckBox ssl;
 
     private ObjectProperty<Server> serversRootProperty;
 
