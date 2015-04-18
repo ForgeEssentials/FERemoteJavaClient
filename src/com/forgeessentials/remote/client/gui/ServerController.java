@@ -3,6 +3,8 @@ package com.forgeessentials.remote.client.gui;
 import java.io.IOException;
 
 import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.scene.control.ListView;
 import javafx.scene.control.Tab;
@@ -65,6 +67,17 @@ public class ServerController implements Runnable {
                     controller.setParent(this, tab);
                     controller.init();
                 }
+            features.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<Tab>() {
+                @Override
+                public void changed(ObservableValue<? extends Tab> paramObservableValue, Tab oldValue, Tab newValue)
+                {
+                    if (oldValue != null)
+                        ((FeatureController) oldValue.getContent().getUserData()).deactivate();
+                    if (newValue != null)
+                        ((FeatureController) newValue.getContent().getUserData()).activate();
+                }
+            });
+            ((FeatureController) features.getSelectionModel().getSelectedItem().getContent().getUserData()).activate();
         }
         catch (IOException e)
         {

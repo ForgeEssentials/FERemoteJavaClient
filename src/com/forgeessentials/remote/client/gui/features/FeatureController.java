@@ -34,7 +34,20 @@ public abstract class FeatureController implements Initializable {
 
     public abstract void init();
 
-    public abstract void stop();
+    public void activate()
+    {
+        /* do nothing */
+    }
+
+    public void deactivate()
+    {
+        /* do nothing */
+    }
+
+    public void stop()
+    {
+        /* do nothing */
+    }
 
     public abstract boolean handleResponse(JsonRemoteResponse response);
 

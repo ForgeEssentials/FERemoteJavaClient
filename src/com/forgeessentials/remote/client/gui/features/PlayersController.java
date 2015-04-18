@@ -67,7 +67,11 @@ public class PlayersController extends FeatureController {
         colHunger.setCellValueFactory(new PropertyValueFactory<PlayerInfo, String>("hunger"));
         colSaturation.setCellValueFactory(new PropertyValueFactory<PlayerInfo, String>("saturation"));
         colLocation.setCellValueFactory(new PropertyValueFactory<PlayerInfo, String>("location"));
+    }
 
+    @Override
+    public void activate()
+    {
         updateTimer = new Timer();
         updateTimer.schedule(new TimerTask() {
             @Override
@@ -79,9 +83,19 @@ public class PlayersController extends FeatureController {
     }
 
     @Override
+    public void deactivate()
+    {
+        if (updateTimer != null)
+        {
+            updateTimer.cancel();
+            updateTimer = null;
+        }
+    }
+
+    @Override
     public void stop()
     {
-        updateTimer.cancel();
+        deactivate();
     }
 
     @Override
