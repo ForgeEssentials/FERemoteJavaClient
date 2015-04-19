@@ -105,6 +105,7 @@ public class ServerController implements Runnable {
                 while (log.getItems().size() > 500)
                     log.getItems().remove(0);
                 log.getItems().add(string);
+                log.scrollTo(log.getItems().size());
             }
         });
     }

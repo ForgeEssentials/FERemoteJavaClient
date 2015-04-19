@@ -17,16 +17,17 @@ import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.scene.control.ChoiceDialog;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableColumn.CellDataFeatures;
 import javafx.scene.control.TableView;
-import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.GridPane;
 import javafx.util.Callback;
 
 import com.forgeessentials.remote.client.RemoteRequest;
@@ -138,7 +139,8 @@ public class PermissionsController extends FeatureController {
             @Override
             public void changed(ObservableValue<? extends Entry<String, String>> observable, Entry<String, String> oldValue, Entry<String, String> newValue)
             {
-                permissionKey.getEditor().setText(newValue.getKey());
+                if (newValue != null)
+                    permissionKey.getEditor().setText(newValue.getKey());
             }
         });
         permissionKey.addEventFilter(KeyEvent.KEY_PRESSED, new EventHandler<KeyEvent>() {
@@ -146,9 +148,7 @@ public class PermissionsController extends FeatureController {
             public void handle(KeyEvent event)
             {
                 if (event.getCode() == KeyCode.ENTER)
-                {
                     addPermission(null);
-                }
             }
         });
 
@@ -212,7 +212,7 @@ public class PermissionsController extends FeatureController {
         root.setExpanded(true);
         players.addAll(serverZone.playerPermissions.keySet());
         groups.addAll(serverZone.groupPermissions.keySet());
-        if (selectedZone != null && serverZone.id == selectedZone.getValue().id)
+        if (selectedZone == null || (selectedZone != null && serverZone.id == selectedZone.getValue().id))
             zoneTree.getSelectionModel().select(root);
         for (WorldZone worldZone : serverZone.worldZones.values())
         {
@@ -245,6 +245,8 @@ public class PermissionsController extends FeatureController {
         for (String group : groups)
             groupList.getItems().add(group);
         groupList.getSelectionModel().select(selectedGroup);
+        if (selectedGroup == null && selectedPlayer == null)
+            groupList.getSelectionModel().select("_ALL_");
     }
 
     @Override
@@ -256,14 +258,48 @@ public class PermissionsController extends FeatureController {
     @FXML
     public void addPermission(ActionEvent event)
     {
-        // TODO: Make custom dialog with ComboBox with true / false in it
-        TextInputDialog dialog = new TextInputDialog("true");
+        // try
+        // {
+        // FXMLLoader fxmlLoader = new FXMLLoader(ClassLoader.getSystemResource("dialog/permissionValue.fxml"));
+        // Parent root = fxmlLoader.load();
+        // Scene scene = new Scene(root);
+        // // Scene scene = new Scene(new Group(new Text(0, 20, "Hello World!")));
+        //
+        // Stage dialog2 = new Stage();
+        // dialog2.initStyle(StageStyle.UTILITY);
+        // dialog2.setScene(scene);
+        // dialog2.showAndWait();
+        // }
+        // catch (IOException e)
+        // {
+        // e.printStackTrace();
+        // }
+
+        final ChoiceDialog<String> dialog = new ChoiceDialog<String>("true", "true", "false");
+        @SuppressWarnings("unchecked")
+        final ComboBox<String> cb = ((ComboBox<String>) ((GridPane) dialog.getDialogPane().getContent()).getChildren().get(1));
+        new AutoCompleteLongestMatchListener<String>(cb);
         dialog.setTitle("Enter a value for the permission");
         dialog.setHeaderText(permissionKey.getEditor().getText());
         dialog.setContentText("Value:");
+        cb.setEditable(true);
+        cb.addEventFilter(KeyEvent.KEY_PRESSED, new EventHandler<KeyEvent>() {
+            @Override
+            public void handle(KeyEvent event)
+            {
+                if (event.getCode() == KeyCode.ENTER)
+                {
+                    dialog.setResult(cb.getEditor().getText());
+                    dialog.close();
+                }
+            }
+        });
+        // cb.getSelectionModel().select(0);
+
         Optional<String> result = dialog.showAndWait();
         if (result.isPresent())
         {
+            // serverController.log(permissionKey.getEditor().getText() + " = " + result.get());
             addPermission(permissionKey.getEditor().getText(), result.get());
         }
     }
@@ -291,7 +327,7 @@ public class PermissionsController extends FeatureController {
         RemoteResponse<Object> response = serverController.getClient().sendRequestAndWait(new RemoteRequest<>(SetPermissionHandler.ID, request), Object.class);
         if (response == null || !response.success)
         {
-            serverController.log("Error setting permissions: " + (response == null ? "no response" : response.message));
+            serverController.log("Error setting permission: " + (response == null ? "no response" : response.message));
             return;
         }
         serverController.log("Set permission: " + permission + " = " + value);
