@@ -8,7 +8,7 @@ It allows easy management of FE-based servers, without the need to log into the 
 Requires at least Java 8 u40!
 
 Builds can be temporarily be grabbed from here (no guarantee that they are always up-to-date !!!)  
-https://dl.dropboxusercontent.com/u/26603849/tmp/FERemoteClient.jar
+https://dl.dropboxusercontent.com/u/26603849/FERemote/FERemoteClient.jar
 
 ## Quickstart
 
@@ -19,3 +19,9 @@ https://dl.dropboxusercontent.com/u/26603849/tmp/FERemoteClient.jar
 5. Connect!
 6. ???
 7. Profit
+
+## Screenshots
+
+![Example for permission management](https://dl.dropboxusercontent.com/u/26603849/FERemote/FERemote-permissions.png)
+
+![Server manager](https://dl.dropboxusercontent.com/u/26603849/FERemote/FERemote-server-manager.PNG)
