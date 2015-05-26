@@ -9,3 +9,8 @@ repositories {
 dependencies {
     compile project(':FERemoteLib')
 }
+
+jar {
+	from configurations.compile.collect { it }
+	exclude('jfxrt.jar')
+}
