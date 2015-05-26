@@ -20,9 +20,10 @@ import com.forgeessentials.remote.client.RequestAuth;
 import com.forgeessentials.remote.client.gui.MainController.ServerTab;
 import com.forgeessentials.remote.client.gui.features.FeatureController;
 import com.forgeessentials.remote.client.gui.model.Server;
-import com.forgeessentials.remote.client.network.PushChatHandler;
+import com.forgeessentials.remote.network.ChatResponse;
 
-public class ServerController implements Runnable {
+public class ServerController implements Runnable
+{
 
     public static final int TIMEOUT = 30 * 1000;
 
@@ -143,10 +144,10 @@ public class ServerController implements Runnable {
             }
             switch (response.id)
             {
-            case PushChatHandler.ID:
+            case ChatResponse.ID:
             {
-                RemoteResponse<PushChatHandler.Response> r = client.transformResponse(response, PushChatHandler.Response.class);
-                log(String.format("Chat (%s): %s", r.data.username, r.data.message));
+                RemoteResponse<ChatResponse> r = client.transformResponse(response, ChatResponse.class);
+                log(String.format("Chat (%s): %s", r.data.sender, r.data.message));
                 break;
             }
             case "shutdown":

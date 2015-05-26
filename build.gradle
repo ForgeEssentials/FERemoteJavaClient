@@ -1,0 +1,11 @@
+apply from: 'javafx.plugin'
+
+repositories {
+	mavenCentral()
+	mavenLocal()
+	jcenter()
+}
+
+dependencies {
+    compile project(':FERemoteLib')
+}

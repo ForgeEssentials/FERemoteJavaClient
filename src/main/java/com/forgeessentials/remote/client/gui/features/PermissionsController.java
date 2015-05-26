@@ -2,7 +2,6 @@ package com.forgeessentials.remote.client.gui.features;
 
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
@@ -30,22 +29,22 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.GridPane;
 import javafx.util.Callback;
 
+import com.forgeessentials.remote.RemoteMessageID;
 import com.forgeessentials.remote.client.RemoteRequest;
 import com.forgeessentials.remote.client.RemoteResponse;
 import com.forgeessentials.remote.client.RemoteResponse.JsonRemoteResponse;
+import com.forgeessentials.remote.client.data.AreaZone;
 import com.forgeessentials.remote.client.data.PermissionList;
+import com.forgeessentials.remote.client.data.ServerZone;
 import com.forgeessentials.remote.client.data.UserIdent;
+import com.forgeessentials.remote.client.data.WorldZone;
+import com.forgeessentials.remote.client.data.Zone;
 import com.forgeessentials.remote.client.gui.control.AutoCompleteLongestMatchListener;
-import com.forgeessentials.remote.client.network.permission.QueryPermissionsHandler;
-import com.forgeessentials.remote.client.network.permission.QueryPermissionsHandler.AreaZone;
-import com.forgeessentials.remote.client.network.permission.QueryPermissionsHandler.ServerZone;
-import com.forgeessentials.remote.client.network.permission.QueryPermissionsHandler.WorldZone;
-import com.forgeessentials.remote.client.network.permission.QueryPermissionsHandler.Zone;
-import com.forgeessentials.remote.client.network.permission.QueryRegisteredPermissionsHandler;
-import com.forgeessentials.remote.client.network.permission.SetPermissionHandler;
-import com.google.gson.reflect.TypeToken;
+import com.forgeessentials.remote.network.QueryRegisteredPermissionsResponse;
+import com.forgeessentials.remote.network.SetPermissionRequest;
 
-public class PermissionsController extends FeatureController {
+public class PermissionsController extends FeatureController
+{
 
     @FXML
     protected TreeView<Zone> zoneTree;
@@ -152,9 +151,8 @@ public class PermissionsController extends FeatureController {
             }
         });
 
-        RemoteResponse<List<String>> response = serverController.getClient().sendRequestAndWait(
-                new RemoteRequest<Object>(QueryRegisteredPermissionsHandler.ID, null), new TypeToken<List<String>>() {
-                }.getType());
+        RemoteResponse<QueryRegisteredPermissionsResponse> response = serverController.getClient().sendRequestAndWait(
+                new RemoteRequest<Object>(QueryRegisteredPermissionsResponse.ID, null), QueryRegisteredPermissionsResponse.class);
         if (response != null && response.success)
             permissionKey.setItems(FXCollections.observableList(response.data));;
         new AutoCompleteLongestMatchListener<String>(permissionKey);
@@ -190,8 +188,8 @@ public class PermissionsController extends FeatureController {
 
     private void queryPermissions()
     {
-        RemoteResponse<QueryPermissionsHandler.Response> response = serverController.getClient().sendRequestAndWait(
-                new RemoteRequest<>(QueryPermissionsHandler.ID, null), QueryPermissionsHandler.Response.class);
+        RemoteResponse<ServerZone> response = serverController.getClient().sendRequestAndWait(new RemoteRequest<>(RemoteMessageID.QUERY_PERMISSIONS, null),
+                ServerZone.class);
         if (response == null || !response.success)
         {
             serverController.log("Error getting permissions: " + (response == null ? "no response" : response.message));
@@ -316,15 +314,15 @@ public class PermissionsController extends FeatureController {
         if (zone == null)
             return;
 
-        SetPermissionHandler.Request request;
+        SetPermissionRequest request;
         if (selectedGroup != null)
-            request = new SetPermissionHandler.Request(zone.getValue().id, selectedGroup, permission, value);
+            request = new SetPermissionRequest(zone.getValue().id, selectedGroup, permission, value);
         else if (selectedPlayer != null)
-            request = new SetPermissionHandler.Request(zone.getValue().id, selectedPlayer, permission, value);
+            request = new SetPermissionRequest(zone.getValue().id, selectedPlayer, permission, value);
         else
             return;
 
-        RemoteResponse<Object> response = serverController.getClient().sendRequestAndWait(new RemoteRequest<>(SetPermissionHandler.ID, request), Object.class);
+        RemoteResponse<Object> response = serverController.getClient().sendRequestAndWait(new RemoteRequest<>(SetPermissionRequest.ID, request), Object.class);
         if (response == null || !response.success)
         {
             serverController.log("Error setting permission: " + (response == null ? "no response" : response.message));
@@ -340,15 +338,15 @@ public class PermissionsController extends FeatureController {
         if (zone == null)
             return;
 
-        SetPermissionHandler.Request request;
+        SetPermissionRequest request;
         if (selectedGroup != null)
-            request = new SetPermissionHandler.Request(zone.getValue().id, selectedGroup, permission, null);
+            request = new SetPermissionRequest(zone.getValue().id, selectedGroup, permission, null);
         else if (selectedPlayer != null)
-            request = new SetPermissionHandler.Request(zone.getValue().id, selectedPlayer, permission, null);
+            request = new SetPermissionRequest(zone.getValue().id, selectedPlayer, permission, null);
         else
             return;
 
-        RemoteResponse<Object> response = serverController.getClient().sendRequestAndWait(new RemoteRequest<>(SetPermissionHandler.ID, request), Object.class);
+        RemoteResponse<Object> response = serverController.getClient().sendRequestAndWait(new RemoteRequest<>(SetPermissionRequest.ID, request), Object.class);
         if (response == null || !response.success)
         {
             serverController.log("Error setting permissions: " + (response == null ? "no response" : response.message));

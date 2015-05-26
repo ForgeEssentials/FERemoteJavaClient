@@ -1,0 +1,3 @@
+[submodule "FERemoteLib"]
+	path = FERemoteLib
+	url = https://github.com/ForgeEssentials/FERemoteLib.git

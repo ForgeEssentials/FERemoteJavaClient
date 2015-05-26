@@ -22,10 +22,12 @@ import com.forgeessentials.remote.client.RemoteRequest;
 import com.forgeessentials.remote.client.RemoteResponse;
 import com.forgeessentials.remote.client.RemoteResponse.JsonRemoteResponse;
 import com.forgeessentials.remote.client.data.DataFloatLocation;
-import com.forgeessentials.remote.client.network.QueryPlayerHandler;
-import com.forgeessentials.remote.client.network.QueryPlayerHandler.PlayerInfoResponse;
+import com.forgeessentials.remote.network.PlayerInfoResponse;
+import com.forgeessentials.remote.network.QueryPlayerRequest;
+import com.forgeessentials.remote.network.QueryPlayerResponse;
 
-public class PlayersController extends FeatureController {
+public class PlayersController extends FeatureController
+{
 
     @FXML
     protected TableView<PlayerInfo> playersTable;
@@ -60,7 +62,7 @@ public class PlayersController extends FeatureController {
     public void init()
     {
         tab.setText("Players");
-        
+
         colName.setCellValueFactory(new PropertyValueFactory<PlayerInfo, String>("name"));
         colHealth.setCellValueFactory(new PropertyValueFactory<PlayerInfo, String>("health"));
         colArmor.setCellValueFactory(new PropertyValueFactory<PlayerInfo, String>("armor"));
@@ -114,9 +116,9 @@ public class PlayersController extends FeatureController {
         if (flagLocation.isSelected())
             flags.add("location");
 
-        final RemoteRequest<QueryPlayerHandler.Request> request = new RemoteRequest<>(QueryPlayerHandler.ID, new QueryPlayerHandler.Request(null, flags));
-        final RemoteResponse<QueryPlayerHandler.Response> response = serverController.getClient()
-                .sendRequestAndWait(request, QueryPlayerHandler.Response.class);
+        final RemoteRequest<QueryPlayerRequest> request = new RemoteRequest<>(QueryPlayerRequest.ID, new QueryPlayerRequest(null, flags));
+        final RemoteResponse<QueryPlayerResponse> response = serverController.getClient()
+                .sendRequestAndWait(request, QueryPlayerResponse.class);
         if (response == null)
         {
             serverController.log("Error: no response");
@@ -130,7 +132,7 @@ public class PlayersController extends FeatureController {
         Platform.runLater(new Runnable() {
             @Override
             public void run()
-            {
+            { 
                 playersTable.getItems().clear();
                 for (PlayerInfoResponse pi : response.data.players)
                 {
@@ -186,7 +188,8 @@ public class PlayersController extends FeatureController {
         queryPlayers();
     }
 
-    public static class PlayerInfo {
+    public static class PlayerInfo
+    {
 
         StringProperty name;
 
