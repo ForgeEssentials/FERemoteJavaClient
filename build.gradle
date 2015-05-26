@@ -1,5 +1,7 @@
 apply from: 'javafx.plugin'
 
+rootProject.name = 'FERemoteClient'
+
 repositories {
 	mavenCentral()
 	mavenLocal()
