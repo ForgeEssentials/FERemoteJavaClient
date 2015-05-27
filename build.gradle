@@ -1,4 +1,4 @@
-apply from: 'javafx.plugin'
+apply from: "javafx.plugin"
 
 repositories {
 	mavenCentral()
@@ -7,10 +7,89 @@ repositories {
 }
 
 dependencies {
-    compile project(':FERemoteLib')
+    compile project(":FERemoteLib")
 }
 
+// Configure packaging of required jars with jar-in-jar-loader from eclipse
 jar {
+	manifest {
+		attributes("Rsrc-Main-Class": "com.forgeessentials.remote.client.gui.Main")
+		attributes("Rsrc-Class-Path": "./ gson-2.3.1.jar")
+	}
 	from configurations.compile.collect { it }
-	exclude('jfxrt.jar')
+	from zipTree("jar-in-jar-loader.zip")
+	exclude("jfxrt.jar")
+}
+javafx.mainClass "org.eclipse.jdt.internal.jarinjarloader.JarRsrcLoader"
+
+// Clean libs directory
+task cleanTempDir(type: Delete, dependsOn: jar) {
+	delete fileTree(dir:project.libsDir, exclude:"FERemoteClient.jar")
+}
+build.dependsOn cleanTempDir
+
+// Configure JavaFx attributes
+javafx {
+    appID "FERemoteClient"
+    appName "ForgeEssentials Remote Client"
+    category = "Games"
+    description = "Client for connecting to Minecraft servers with the ForgeEssentials remote API"
+    vendor = "ForgeEssentials"
+    // copyright = "Copyright (c) 2015 ForgeEssentials"
+    // licenseType = "Apache 2.0"
+	
+	/*
+    jvmArgs = ["-XX:+AggressiveOpts", "-XX:CompileThreshold=1"]
+    systemProperties = [ "prism.disableRegionCaching":"true" ]
+    arguments = ["-l", "--fast"]
+ 
+    embedLauncher = false
+ 
+    // deploy/info attributes
+    installSystemWide = true
+    menu = true
+    shortcut = true
+ 
+    // app icons
+    icons {
+        shortcut = ["shortcut-16.png", "shortcut-32.png", "shortcut-128.png", "shortcut-256.png", "shortcut-16@2x.png", "shortcut-32@2x.png", "shortcut-128@2x.png"]
+        volume = "javafx-icon.png"
+        setup = "javafx-icon.png"
+    }
+ 
+    // applet and webstart stuff
+    debugKey {
+        alias = "debugKey"
+        //keyPass = "password" // provide via command line
+        keyStore = file("~/keys/debug.jks")
+        //storePass = "password"  // provide via command line
+    }
+    releaseKey {
+        alias = "production"
+        //keyPass = "password" // provide via command line
+        keyStore = file("/Volumes/ProdThumbDrive/production.jks")
+        //storePass = "password"  // provide via command line
+    }
+    signingMode "release"
+ 
+    width = 800
+    height = 600
+    embedJNLP = false
+    codebase = "http://example.com/bogus/JNLP/Codebase"
+ 
+    // arbitrary jnlp icons
+    icon {
+        href = "src/main/resources/javafx-icon.png"
+        kind = "splash"
+        width = 128
+        height = 128
+    }
+    icon {
+        href = "shortcut-32@2x.png"
+        kind = "selected"
+        width = 16
+        height = 16
+        scale = 1
+    }
+	*/
 }

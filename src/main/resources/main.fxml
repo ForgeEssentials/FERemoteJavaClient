@@ -20,7 +20,7 @@
 		</ToolBar>
 	</top>
 	<bottom>
-		<Label maxWidth="1.7976931348623157E308" text="Status bar" BorderPane.alignment="CENTER">
+		<Label fx:id="statusBar" maxWidth="1.7976931348623157E308" text="Status bar" BorderPane.alignment="CENTER">
 			<padding>
 				<Insets left="4.0" right="4.0" />
 			</padding>

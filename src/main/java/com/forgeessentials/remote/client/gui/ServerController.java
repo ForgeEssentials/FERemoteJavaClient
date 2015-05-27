@@ -1,6 +1,7 @@
 package com.forgeessentials.remote.client.gui;
 
 import java.io.IOException;
+import java.net.UnknownHostException;
 
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
@@ -11,6 +12,7 @@ import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.layout.Region;
 
+import com.forgeessentials.remote.RemoteMessageID;
 import com.forgeessentials.remote.client.RemoteClient;
 import com.forgeessentials.remote.client.RemoteRequest;
 import com.forgeessentials.remote.client.RemoteRequest.PushRequestData;
@@ -21,6 +23,8 @@ import com.forgeessentials.remote.client.gui.MainController.ServerTab;
 import com.forgeessentials.remote.client.gui.features.FeatureController;
 import com.forgeessentials.remote.client.gui.model.Server;
 import com.forgeessentials.remote.network.ChatResponse;
+
+import javafx.scene.control.TextField;
 
 public class ServerController implements Runnable
 {
@@ -36,6 +40,9 @@ public class ServerController implements Runnable
     @FXML
     protected TabPane features;
 
+    @FXML
+    protected TextField input;
+
     private RemoteClient client;
 
     private RequestAuth auth;
@@ -46,46 +53,37 @@ public class ServerController implements Runnable
 
     /* ------------------------------------------------------------ */
 
-    public boolean init(Server server)
+    public void init(Server server) throws UnknownHostException, IOException
     {
         this.server = server;
-        try
-        {
-            client = new RemoteClient(server.addressProperty().get(), server.portProperty().get());
-            if (!server.usernameProperty().get().isEmpty())
-                auth = new RequestAuth(server.usernameProperty().get(), server.passkeyProperty().get());
-            else
-                auth = null;
-            new Thread(this).start();
-            queryCapabilities();
-            pushChat(true);
+        client = new RemoteClient(server.addressProperty().get(), server.portProperty().get());
+        if (!server.usernameProperty().get().isEmpty())
+            auth = new RequestAuth(server.usernameProperty().get(), server.passkeyProperty().get());
+        else
+            auth = null;
+        new Thread(this).start();
+        queryCapabilities();
+        pushChat(true);
 
-            // Initialize controllers for feature-tabs
-            for (Tab tab : features.getTabs())
-                if (tab.getContent().getUserData() instanceof FeatureController)
-                {
-                    FeatureController controller = (FeatureController) tab.getContent().getUserData();
-                    controller.setParent(this, tab);
-                    controller.init();
-                }
-            features.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<Tab>() {
-                @Override
-                public void changed(ObservableValue<? extends Tab> paramObservableValue, Tab oldValue, Tab newValue)
-                {
-                    if (oldValue != null)
-                        ((FeatureController) oldValue.getContent().getUserData()).deactivate();
-                    if (newValue != null)
-                        ((FeatureController) newValue.getContent().getUserData()).activate();
-                }
-            });
-            ((FeatureController) features.getSelectionModel().getSelectedItem().getContent().getUserData()).activate();
-        }
-        catch (IOException e)
-        {
-            e.printStackTrace();
-            return false;
-        }
-        return true;
+        // Initialize controllers for feature-tabs
+        for (Tab tab : features.getTabs())
+            if (tab.getContent().getUserData() instanceof FeatureController)
+            {
+                FeatureController controller = (FeatureController) tab.getContent().getUserData();
+                controller.setParent(this, tab);
+                controller.init();
+            }
+        features.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<Tab>() {
+            @Override
+            public void changed(ObservableValue<? extends Tab> paramObservableValue, Tab oldValue, Tab newValue)
+            {
+                if (oldValue != null)
+                    ((FeatureController) oldValue.getContent().getUserData()).deactivate();
+                if (newValue != null)
+                    ((FeatureController) newValue.getContent().getUserData()).activate();
+            }
+        });
+        ((FeatureController) features.getSelectionModel().getSelectedItem().getContent().getUserData()).activate();
     }
 
     public void stop()
@@ -191,7 +189,7 @@ public class ServerController implements Runnable
 
     private void queryCapabilities()
     {
-        RemoteRequest<Object> request = new RemoteRequest<Object>("query_remote_capabilities", auth, null);
+        RemoteRequest<Object> request = new RemoteRequest<Object>(RemoteMessageID.QUERY_REMOTE_CAPABILITIES, auth, null);
         JsonRemoteResponse response = client.sendRequestAndWait(request, TIMEOUT);
         if (response == null)
         {
@@ -208,7 +206,7 @@ public class ServerController implements Runnable
 
     private void pushChat(boolean enable)
     {
-        RemoteRequest<PushRequestData> request = new RemoteRequest<PushRequestData>("push_chat", auth, new PushRequestData(enable));
+        RemoteRequest<PushRequestData> request = new RemoteRequest<PushRequestData>(RemoteMessageID.PUSH_CHAT, auth, new PushRequestData(enable));
         JsonRemoteResponse response = client.sendRequestAndWait(request, TIMEOUT);
         if (response == null)
         {
@@ -221,6 +219,28 @@ public class ServerController implements Runnable
             return;
         }
         log(response.data != null ? response.data.toString() : response.message);
+    }
+
+    /* ------------------------------------------------------------ */
+
+    @FXML
+    public void sendInput()
+    {
+        String line = input.getText();
+        input.setText("");
+        if (line.isEmpty())
+            return;
+
+        if (line.startsWith("/"))
+        {
+            RemoteRequest<String> request = new RemoteRequest<String>(RemoteMessageID.COMMAND, auth, line.substring(1));
+            client.sendRequestSafe(request);
+        }
+        else
+        {
+            RemoteRequest<String> request = new RemoteRequest<String>(RemoteMessageID.CHAT, auth, line);
+            client.sendRequestSafe(request);
+        }
     }
 
     /* ------------------------------------------------------------ */

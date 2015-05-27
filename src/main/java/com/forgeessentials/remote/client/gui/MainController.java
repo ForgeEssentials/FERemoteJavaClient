@@ -30,11 +30,16 @@ import javafx.stage.Stage;
 import com.forgeessentials.remote.client.gui.model.Server;
 import com.forgeessentials.remote.client.gui.type.DataManager;
 import com.google.gson.JsonParseException;
+import javafx.scene.control.Label;
 
-public class MainController implements Initializable {
+public class MainController implements Initializable
+{
 
     @FXML
-    TabPane servers;
+    public TabPane servers;
+
+    @FXML
+    public Label statusBar;
 
     public ObjectProperty<Server> serversRoot;
 
@@ -144,8 +149,16 @@ public class MainController implements Initializable {
             FXMLLoader fxmlLoader = new FXMLLoader(ClassLoader.getSystemResource("server.fxml"));
             Parent content = fxmlLoader.load();
             ServerController controller = fxmlLoader.getController();
-            if (controller.init(server))
+            try
+            {
+                controller.init(server);
                 servers.getTabs().add(new ServerTab(controller, content));
+                statusBar.setText("Sucessfully connected to server");
+            }
+            catch (IOException e)
+            {
+                statusBar.setText("Unable to connect to server: " + e.getMessage());
+            }
         }
         catch (IOException e)
         {
@@ -153,7 +166,8 @@ public class MainController implements Initializable {
         }
     }
 
-    public class ServerTab extends Tab {
+    public class ServerTab extends Tab
+    {
 
         private ServerController controller;
 

@@ -18,6 +18,7 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.ChoiceDialog;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableColumn.CellDataFeatures;
@@ -88,6 +89,21 @@ public class PermissionsController extends FeatureController
             public ObservableValue<String> call(CellDataFeatures<Entry<String, String>, String> value)
             {
                 return new SimpleStringProperty(value.getValue().getValue());
+            }
+        });
+        playerList.setCellFactory(new Callback<ListView<UserIdent>, ListCell<UserIdent>>() {
+            @Override
+            public ListCell<UserIdent> call(ListView<UserIdent> param)
+            {
+                return new ListCell<UserIdent>() {
+                    @Override
+                    public void updateItem(UserIdent user, boolean empty)
+                    {
+                        super.updateItem(user, empty);
+                        if(user != null)
+                            setText(user.getUsernameOrUuid());
+                    }
+                };
             }
         });
 

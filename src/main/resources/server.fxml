@@ -27,6 +27,22 @@
 				</Tab>
 			</tabs>
 		</TabPane>
-		<ListView fx:id="log" prefHeight="149.0" prefWidth="600.0" style=".list-cell:filled {&#10;    -fx-text-fill: red;&#10;}" />
+      <VBox>
+         <children>
+      		<ListView fx:id="log" prefHeight="149.0" prefWidth="600.0" style=".list-cell:filled {&#10;    -fx-text-fill: red;&#10;}" VBox.vgrow="ALWAYS" />
+            <HBox spacing="5.0">
+               <children>
+                  <TextField fx:id="input" HBox.hgrow="ALWAYS" />
+                  <Button defaultButton="true" mnemonicParsing="false" onAction="#sendInput" text="Send">
+                     <HBox.margin>
+                        <Insets />
+                     </HBox.margin></Button>
+               </children>
+               <VBox.margin>
+                  <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+               </VBox.margin>
+            </HBox>
+         </children>
+      </VBox>
 	</items>
 </SplitPane>
