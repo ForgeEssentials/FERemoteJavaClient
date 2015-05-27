@@ -12,19 +12,32 @@ dependencies {
 
 // Configure packaging of required jars with jar-in-jar-loader from eclipse
 jar {
+	//dependsOn ":FERemoteLib:build"
 	manifest {
 		attributes("Rsrc-Main-Class": "com.forgeessentials.remote.client.gui.Main")
 		attributes("Rsrc-Class-Path": "./ gson-2.3.1.jar")
 	}
+
+	// Include generally all dependencies
 	from configurations.compile.collect { it }
+
+	// Include jar-in-jar-loader
 	from zipTree("jar-in-jar-loader.zip")
+
+	// Include FERemoteLib as class files and not as jar
+	from zipTree(new File(project(":FERemoteLib").libsDir, "FERemoteLib.jar"))
+	exclude("FERemoteLib.jar")
+
+	// Exclude JavaFx dependency
 	exclude("jfxrt.jar")
 }
 javafx.mainClass "org.eclipse.jdt.internal.jarinjarloader.JarRsrcLoader"
 
 // Clean libs directory
 task cleanTempDir(type: Delete, dependsOn: jar) {
-	delete fileTree(dir:project.libsDir, exclude:"FERemoteClient.jar")
+	delete fileTree(project.libsDir).matching {
+		exclude "FERemoteClient.jar", "servers.json"
+	}
 }
 build.dependsOn cleanTempDir
 
