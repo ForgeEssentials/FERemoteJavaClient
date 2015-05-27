@@ -44,6 +44,8 @@ public class ServerController implements Runnable
     @FXML
     protected TextField input;
 
+    private MainController mainController;
+
     private RemoteClient client;
 
     private RequestAuth auth;
@@ -52,10 +54,13 @@ public class ServerController implements Runnable
 
     private ServerTab serverTab;
 
+    private boolean logSuccessMessages = false;
+
     /* ------------------------------------------------------------ */
 
-    public void init(Server server) throws UnknownHostException, IOException
+    public void init(MainController mainController, Server server) throws UnknownHostException, IOException
     {
+        this.mainController = mainController;
         this.server = server;
         client = new RemoteClient(server.addressProperty().get(), server.portProperty().get());
         if (!server.usernameProperty().get().isEmpty())
@@ -89,14 +94,22 @@ public class ServerController implements Runnable
 
     public void stop()
     {
-        // Stop controllers for feature-tabs
-        for (Tab tab : features.getTabs())
-            if (tab.getContent().getUserData() instanceof FeatureController)
-                ((FeatureController) tab.getContent().getUserData()).stop();
-        client.close();
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run()
+            {
+                // Stop controllers for feature-tabs
+                for (Tab tab : features.getTabs())
+                    if (tab.getContent().getUserData() instanceof FeatureController)
+                        ((FeatureController) tab.getContent().getUserData()).stop();
+                client.close();
+                mainController.setStatusMessage("Disconnected");
+                mainController.servers.getTabs().remove(serverTab);
+            }
+        });
     }
 
-    public void log(final String string)
+    public void log(final String message)
     {
         Platform.runLater(new Runnable() {
             @Override
@@ -104,10 +117,15 @@ public class ServerController implements Runnable
             {
                 while (log.getItems().size() > 500)
                     log.getItems().remove(0);
-                log.getItems().add(string);
+                log.getItems().add(message);
                 log.scrollTo(log.getItems().size());
             }
         });
+    }
+
+    public void status(String message)
+    {
+        mainController.setStatusMessage(message);
     }
 
     /* ------------------------------------------------------------ */
@@ -122,6 +140,8 @@ public class ServerController implements Runnable
             if (response != null)
                 handleResponse(response);
         }
+        mainController.setStatusMessage("Disconnected");
+        stop();
     }
 
     protected void handleResponse(JsonRemoteResponse response)
@@ -156,7 +176,7 @@ public class ServerController implements Runnable
             case "shutdown":
             {
                 log("Server shutdown");
-                client.close();
+                stop();
                 break;
             }
             default:
@@ -172,10 +192,14 @@ public class ServerController implements Runnable
             response.id = "";
         if (response.message == null)
             response.message = response.success ? "success" : "failure";
+        String message;
         if (response.data == null)
-            log(String.format("%s #%d: %s", response.id, response.rid, response.message));
+            message = String.format("%s (%s#%d)", response.message, response.id, response.rid);
         else
-            log(String.format("%s #%d: %s: %s", response.id, response.rid, response.message, response.data.toString()));
+            message = String.format("%s: %s (%s#%d)", response.message, response.data.toString(), response.id, response.rid);
+        mainController.setStatusMessage(message);
+        if (logSuccessMessages || !response.success)
+            log(message);
     }
 
     /* ------------------------------------------------------------ */
@@ -200,18 +224,12 @@ public class ServerController implements Runnable
     private void pushChat(boolean enable)
     {
         RemoteRequest<PushRequestData> request = new RemoteRequest<PushRequestData>(RemoteMessageID.PUSH_CHAT, auth, new PushRequestData(enable));
-        JsonRemoteResponse response = client.sendRequestAndWait(request, TIMEOUT);
-        if (response == null)
-        {
-            log("Error: no response");
-            return;
-        }
-        if (!response.success)
-        {
-            log("Error: " + response.message);
-            return;
-        }
-        log(response.data != null ? response.data.toString() : response.message);
+        client.sendRequestSafe(request);
+        /*
+         * JsonRemoteResponse response = client.sendRequestAndWait(request, TIMEOUT); if (response == null) {
+         * log("Error: no response"); return; } if (!response.success) { log("Error: " + response.message); return; }
+         * log(response.data != null ? response.data.toString() : response.message);
+         */
     }
 
     /* ------------------------------------------------------------ */

@@ -8,6 +8,7 @@ import java.io.Writer;
 import java.net.URL;
 import java.util.ResourceBundle;
 
+import javafx.application.Platform;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
@@ -30,6 +31,7 @@ import javafx.stage.Stage;
 import com.forgeessentials.remote.client.gui.model.Server;
 import com.forgeessentials.remote.client.gui.type.DataManager;
 import com.google.gson.JsonParseException;
+
 import javafx.scene.control.Label;
 
 public class MainController implements Initializable
@@ -68,6 +70,30 @@ public class MainController implements Initializable
     public void stop()
     {
         servers.getTabs().clear();
+    }
+
+    public void connect(Server server)
+    {
+        try
+        {
+            FXMLLoader fxmlLoader = new FXMLLoader(ClassLoader.getSystemResource("server.fxml"));
+            Parent content = fxmlLoader.load();
+            ServerController controller = fxmlLoader.getController();
+            try
+            {
+                controller.init(this, server);
+                servers.getTabs().add(new ServerTab(controller, content));
+                statusBar.setText("Sucessfully connected to server");
+            }
+            catch (IOException e)
+            {
+                statusBar.setText("Unable to connect to server: " + e.getMessage());
+            }
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+        }
     }
 
     public void disconnect(ServerController controller)
@@ -142,30 +168,6 @@ public class MainController implements Initializable
         }
     }
 
-    public void connect(Server server)
-    {
-        try
-        {
-            FXMLLoader fxmlLoader = new FXMLLoader(ClassLoader.getSystemResource("server.fxml"));
-            Parent content = fxmlLoader.load();
-            ServerController controller = fxmlLoader.getController();
-            try
-            {
-                controller.init(server);
-                servers.getTabs().add(new ServerTab(controller, content));
-                statusBar.setText("Sucessfully connected to server");
-            }
-            catch (IOException e)
-            {
-                statusBar.setText("Unable to connect to server: " + e.getMessage());
-            }
-        }
-        catch (IOException e)
-        {
-            e.printStackTrace();
-        }
-    }
-
     public class ServerTab extends Tab
     {
 
@@ -203,6 +205,17 @@ public class MainController implements Initializable
             controller.stop();
         }
 
+    }
+
+    public void setStatusMessage(final String message)
+    {
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run()
+            {
+                statusBar.setText(message);
+            }
+        });
     }
 
 }
