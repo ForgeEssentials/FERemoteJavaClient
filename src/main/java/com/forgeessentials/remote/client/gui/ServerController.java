@@ -2,6 +2,7 @@ package com.forgeessentials.remote.client.gui;
 
 import java.io.IOException;
 import java.net.UnknownHostException;
+import java.text.SimpleDateFormat;
 
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
@@ -145,7 +146,11 @@ public class ServerController implements Runnable
             case ChatResponse.ID:
             {
                 RemoteResponse<ChatResponse> r = client.transformResponse(response, ChatResponse.class);
-                log(String.format("Chat (%s): %s", r.data.sender, r.data.message));
+                SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm:ss");
+                if (r.data.sender == null)
+                    log(String.format("[%s] %s", timeFormat.format(r.data.timestamp), r.data.message));
+                else
+                    log(String.format("[%s] %s: %s", timeFormat.format(r.data.timestamp), r.data.sender, r.data.message));
                 break;
             }
             case "shutdown":
@@ -165,24 +170,12 @@ public class ServerController implements Runnable
     {
         if (response.id == null)
             response.id = "";
-        if (response.success)
-        {
-            if (response.message == null)
-                response.message = "success";
-            if (response.data == null)
-                log(String.format("EAT Response %s:#%d (%s)", response.id, response.rid, response.message));
-            else
-                log(String.format("EAT Response %s:#%d (%s): %s", response.id, response.rid, response.message, response.data.toString()));
-        }
+        if (response.message == null)
+            response.message = response.success ? "success" : "failure";
+        if (response.data == null)
+            log(String.format("%s #%d: %s", response.id, response.rid, response.message));
         else
-        {
-            if (response.message == null)
-                response.message = "failure";
-            if (response.data == null)
-                log(String.format("EAT Response %s:#%d (%s)", response.id, response.rid, response.message));
-            else
-                log(String.format("EAT Response %s:#%d (%s): %s", response.id, response.rid, response.message, response.data.toString()));
-        }
+            log(String.format("%s #%d: %s: %s", response.id, response.rid, response.message, response.data.toString()));
     }
 
     /* ------------------------------------------------------------ */

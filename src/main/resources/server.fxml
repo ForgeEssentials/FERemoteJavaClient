@@ -11,7 +11,7 @@
 <?import javafx.scene.shape.*?>
 <?import javafx.scene.web.*?>
 
-<SplitPane fx:id="root" dividerPositions="0.75" orientation="VERTICAL" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.forgeessentials.remote.client.gui.ServerController">
+<SplitPane fx:id="root" dividerPositions="0.662125340599455" orientation="VERTICAL" prefHeight="750.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.forgeessentials.remote.client.gui.ServerController">
 	<items>
 		<TabPane fx:id="features" prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE">
 			<tabs>
