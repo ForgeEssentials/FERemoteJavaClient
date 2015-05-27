@@ -3,7 +3,7 @@ FERemoteClient
 
 JavaFX based client to use the ForgeEssentials remote API.
 
-It allows easy management of FE-based servers, without the need to log into the server.
+It allows easy and convenient management of FE-based servers, without the need to log into the server.
 
 Requires at least Java 8 u40!
 
