@@ -310,6 +310,10 @@ public class PermissionsController extends FeatureController
         });
         // cb.getSelectionModel().select(0);
 
+        Entry<String,String> item = permissionTable.getSelectionModel().getSelectedItem();
+        if ((item != null) && item.getKey().equals(permissionKey.getEditor().getText()))
+            cb.getEditor().setText(item.getValue());
+
         Optional<String> result = dialog.showAndWait();
         if (result.isPresent())
         {
