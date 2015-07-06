@@ -21,6 +21,6 @@ Requires at least Java 8 u40!
 
 ## Screenshots
 
-![Example for permission management](https://dl.dropboxusercontent.com/u/26603849/FERemote/FERemote-permissions.png)
+![Example for permission management](https://dl.dropboxusercontent.com/u/26603849/ForgeEssentials/FERemote/FERemote-permissions.png)
 
-![Server manager](https://dl.dropboxusercontent.com/u/26603849/FERemote/FERemote-server-manager.PNG)
+![Server manager](https://dl.dropboxusercontent.com/u/26603849/ForgeEssentials/FERemote/FERemote-server-manager.PNG)
