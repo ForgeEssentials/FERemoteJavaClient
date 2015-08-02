@@ -1,4 +1,5 @@
 apply from: "javafx.plugin"
+apply plugin: "eclipse"
 
 repositories {
 	mavenCentral()
